@@ -296,7 +296,7 @@ while input_start_key == '':
                 # DVD封面cover
                 coverg = re.search(r'bigImage" href="(.+?)">', html_web)  # 封面图片的正则对象
                 if str(coverg) != 'None':
-                    url_cover = coverg.group(1)
+                    url_cover = url_bus + coverg.group(1)
                 else:
                     url_cover = ''
                 # 发行日期
