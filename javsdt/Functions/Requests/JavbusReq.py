@@ -9,12 +9,33 @@ import re, os, requests
 
 # 搜索javbus，或请求javbus上jav所在网页，返回html
 def get_bus_html(url, proxy):
+    cookies = {
+        'existmag': 'all',
+    }
+
+    headers = {
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'accept-language': 'zh-CN,zh;q=0.9',
+        'cache-control': 'no-cache',
+        'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Mobile Safari/537.36',
+    }
     for retry in range(10):
         try:
             if proxy:       # existmag=all为了 获得所有影片，而不是默认的有磁力的链接
-                rqs = requests.get(url, proxies=proxy, timeout=(6, 7), headers={'Cookie': 'existmag=all'})
+                rqs = requests.get(url, proxies=proxy, timeout=(6, 7), cookies=cookies, headers=headers)
             else:
-                rqs = requests.get(url, timeout=(6, 7), headers={'Cookie': 'existmag=all'})
+                # print('request1')
+                rqs = requests.get(url, timeout=(6, 7), cookies=cookies, headers=headers)
+                # rqs = requests.get('https://www.buscdn.cfd/search/waaa-201&type=&parent=ce', cookies=cookies,
+                #                         headers=headers)
+                # conn = http.client.HTTPSConnection("www.buscdn.cfd")
+
+                # headers = {'cookie': "existmag=mag"}
+
+                # conn.request("GET", "/search/waaa-201&type=&parent=ce", headers=headers)
+
+                # res = conn.getresponse()
+                # data = res.read()
         except requests.exceptions.ProxyError:
             # print(format_exc())
             print('    >通过局部代理失败，重新尝试...')
@@ -25,6 +46,7 @@ def get_bus_html(url, proxy):
             continue
         rqs.encoding = 'utf-8'
         rqs_content = rqs.text
+        # rqs_content = data.decode("utf-8")
         if re.search(r'JavBus', rqs_content):
             return rqs_content
         else:
