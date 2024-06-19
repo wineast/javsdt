@@ -296,7 +296,12 @@ while input_start_key == '':
                 # DVD封面cover
                 coverg = re.search(r'bigImage" href="(.+?)">', html_web)  # 封面图片的正则对象
                 if str(coverg) != 'None':
-                    url_cover = url_bus + coverg.group(1)
+                    # 页面上直接给了绝对路径，但有时候是相对路径
+                    # https://pics.dmm.co.jp/digital/video/ymdd00381/ymdd00381pl.jpg
+                    if coverg.group(1).startswith('http'):
+                        url_cover = coverg.group(1)
+                    else:
+                        url_cover = url_bus + coverg.group(1)
                 else:
                     url_cover = ''
                 # 发行日期
@@ -521,7 +526,12 @@ while input_start_key == '':
                         # 下载封面
                         print('    >从javbus下载封面：', url_cover)
                         try:
-                            download_pic(url_cover, path_fanart, proxy_bus)
+                            # 如果是dmm链接，则使用dmm代理
+                            # 前提是先打开dmm代理设置
+                            if 'dmm.co.jp' in url_cover:
+                                download_pic(url_cover, path_fanart, proxy_dmm)
+                            else:
+                                download_pic(url_cover, path_fanart, proxy_bus)
                             print('    >fanart.jpg下载成功')
                         except:
                             num_fail += 1
